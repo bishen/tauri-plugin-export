@@ -1,0 +1,19 @@
+"$schema" = "schemas/schema.json"
+
+[default]
+description = "Default permissions for the Export plugin"
+permissions = ["allow-export", "allow-export-docx"]
+
+[[permission]]
+identifier = "allow-export"
+description = "Allow exporting data to Excel files"
+
+[permission.commands]
+allow = ["export"]
+
+[[permission]]
+identifier = "allow-export-docx"
+description = "Allow exporting report to DOCX files"
+
+[permission.commands]
+allow = ["export_docx"]
