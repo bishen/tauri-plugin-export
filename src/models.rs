@@ -20,6 +20,9 @@ fn default_span() -> u16 { 1 }
 pub struct SheetData {
     /// 工作表名称
     pub name: String,
+    /// 标题行（可选，大号字体居中合并显示在第一行）
+    #[serde(default)]
+    pub title: Option<String>,
     /// 多行表头（支持多层嵌套）
     pub headers: Vec<Vec<HeaderCell>>,
     /// 数据行

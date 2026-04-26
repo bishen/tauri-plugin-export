@@ -18,6 +18,7 @@
 
 ### Excel 导出
 - **多工作表**: 支持导出多个工作表到单个 Excel 文件
+- **标题行**: 可选标题，大号字体（16pt）加粗居中，自动合并跨所有列
 - **复杂表头**: 支持多行表头，自动处理单元格合并（colspan/rowspan）
 - **自动样式**: 表头和数据单元格自动应用样式（边框、居中、背景色）
 - **类型转换**: 自动将 JSON 值转换为 Excel 单元格内容
@@ -82,6 +83,7 @@ const result = await invoke('plugin:export|export', {
     path: 'D:/output/因子一览表.xlsx',
     sheets: [{
       name: '因子一览表',
+      title: '小班因子一览表',  // 可选，第一行显示大号居中标题
       headers: [
         [{ text: '小班属性', colspan: 5 }, { text: '乔木', colspan: 10 }],
         [{ text: '省' }, { text: '市' }, { text: '县' }, { text: '小班号' }]
@@ -124,10 +126,21 @@ const result = await invoke('plugin:export|export_docx', {
 
 ### Excel: `export(request)` → `ExportResult`
 
+**ExportRequest**:
+
 | 字段 | 类型 | 说明 |
 |------|------|------|
 | path | string | 输出文件路径 |
 | sheets | SheetData[] | 工作表列表 |
+
+**SheetData**:
+
+| 字段 | 类型 | 说明 |
+|------|------|------|
+| name | string | 工作表名称 |
+| title | string? | 标题行（可选，16pt 加粗居中，合并跨所有列） |
+| headers | HeaderCell[][] | 多行表头（支持 colspan/rowspan 合并） |
+| rows | any[][] | 数据行 |
 
 ### DOCX: `export_docx(params)` → `DocxExportResult`
 

@@ -16,6 +16,8 @@ export interface HeaderCell {
 export interface SheetData {
   /** 工作表名称 */
   name: string;
+  /** 标题行（可选，大号字体居中合并显示在第一行） */
+  title?: string;
   /** 多行表头 */
   headers: HeaderCell[][];
   /** 数据行 */

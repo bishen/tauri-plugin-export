@@ -6,9 +6,17 @@ use rust_xlsxwriter::{Format, Workbook, Worksheet};
 pub async fn export(request: ExportRequest) -> Result<ExportResult, Error> {
     let mut workbook = Workbook::new();
     
+    // 标题样式（大号字体居中）
+    let title_format = Format::new()
+        .set_bold()
+        .set_font_size(16.0)
+        .set_align(rust_xlsxwriter::FormatAlign::Center)
+        .set_align(rust_xlsxwriter::FormatAlign::VerticalCenter);
+    
     // 表头样式
     let header_format = Format::new()
         .set_bold()
+        .set_text_wrap()
         .set_align(rust_xlsxwriter::FormatAlign::Center)
         .set_align(rust_xlsxwriter::FormatAlign::VerticalCenter)
         .set_border(rust_xlsxwriter::FormatBorder::Thin)
@@ -24,17 +32,31 @@ pub async fn export(request: ExportRequest) -> Result<ExportResult, Error> {
         let worksheet = workbook.add_worksheet();
         worksheet.set_name(&sheet_data.name)?;
         
+        // 标题行偏移
+        let title_offset: usize = if sheet_data.title.is_some() { 1 } else { 0 };
+        
+        // 写入标题行
+        if let Some(title) = &sheet_data.title {
+            let max_cols = get_max_cols(&sheet_data.headers);
+            if max_cols > 1 {
+                worksheet.merge_range(0, 0, 0, max_cols - 1, title, &title_format)?;
+            } else {
+                worksheet.write_string_with_format(0, 0, title, &title_format)?;
+            }
+            worksheet.set_row_height(0, 30.0)?;
+        }
+        
         // 写入表头
-        let header_rows = write_headers(worksheet, &sheet_data.headers, &header_format)?;
+        let header_rows = write_headers(worksheet, &sheet_data.headers, &header_format, title_offset)?;
         
         // 设置表头行高
         for row in 0..header_rows {
-            worksheet.set_row_height(row as u32, 22.0)?;
+            worksheet.set_row_height((title_offset + row) as u32, 22.0)?;
         }
         
         // 写入数据行
         for (row_idx, row) in sheet_data.rows.iter().enumerate() {
-            let excel_row = (header_rows + row_idx) as u32;
+            let excel_row = (title_offset + header_rows + row_idx) as u32;
             // 设置数据行高
             worksheet.set_row_height(excel_row, 20.0)?;
             for (col_idx, cell) in row.iter().enumerate() {
@@ -65,12 +87,13 @@ fn write_headers(
     worksheet: &mut Worksheet,
     headers: &[Vec<HeaderCell>],
     format: &Format,
+    row_offset: usize,
 ) -> Result<usize, Error> {
     // 跟踪哪些单元格已被占用（由于合并）
     let mut occupied: std::collections::HashSet<(u32, u16)> = std::collections::HashSet::new();
     
     for (row_idx, header_row) in headers.iter().enumerate() {
-        let excel_row = row_idx as u32;
+        let excel_row = (row_offset + row_idx) as u32;
         let mut col: u16 = 0;
         
         for cell in header_row {

@@ -17,6 +17,7 @@ Document export plugin (Excel + DOCX) for Tauri apps, cross-platform support.
 ### Excel Export
 
 - **Multiple Sheets**: Export multiple worksheets to a single Excel file
+- **Title Row**: Optional title displayed in the first row with large font (16pt), bold, centered, merged across all columns
 - **Complex Headers**: Support multi-row headers with automatic cell merging (colspan/rowspan)
 - **Auto Styling**: Automatic styling for headers and data cells (borders, alignment, background)
 - **Type Conversion**: Automatic conversion of JSON values to Excel cell content
@@ -82,6 +83,7 @@ const result = await invoke('plugin:export|export', {
     path: 'D:/output/report.xlsx',
     sheets: [{
       name: 'Sheet1',
+      title: 'Annual Report',  // optional, displays as large centered title in row 1
       headers: [
         [{ text: 'Name' }, { text: 'Value' }]
       ],
@@ -112,10 +114,21 @@ const result = await invoke('plugin:export|export_docx', {
 
 ### Excel: `export(request)` → `ExportResult`
 
+**ExportRequest**:
+
 | Field | Type | Description |
 |-------|------|-------------|
 | path | string | Output file path |
 | sheets | SheetData[] | Array of sheets |
+
+**SheetData**:
+
+| Field | Type | Description |
+|-------|------|-------------|
+| name | string | Worksheet name |
+| title | string? | Title row (optional, 16pt bold centered, merged across all columns) |
+| headers | HeaderCell[][] | Multi-row headers (supports colspan/rowspan merging) |
+| rows | any[][] | Data rows |
 
 ### DOCX: `export_docx(params)` → `DocxExportResult`
 
