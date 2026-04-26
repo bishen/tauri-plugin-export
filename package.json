@@ -1,5 +1,5 @@
 {
-  "name": "@suanjinshan/tauri-plugin-export-api",
+  "name": "@bishen/tauri-plugin-export-api",
   "version": "1.0.0",
   "description": "Tauri plugin for exporting documents (Excel + DOCX)",
   "author": "BiShen <bishen@live.com>",
